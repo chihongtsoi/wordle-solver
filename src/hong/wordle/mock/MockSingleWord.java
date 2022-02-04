@@ -5,10 +5,10 @@ import hong.wordle.solver.Solver;
 import hong.wordle.util.IOUtils;
 
 import java.util.Collection;
-
+import static hong.wordle.util.IOUtils.*;
 public class MockSingleWord {
 
-    private static final String HIDDEN_WORD = "inlet";
+    private static final String HIDDEN_WORD = "fetid";
     public static void main(String[] args) {
         Collection<String> all = IOUtils.readAllWords(Const.WORD_LIST);
         long start = System.currentTimeMillis();
@@ -17,11 +17,11 @@ public class MockSingleWord {
         String response = null;
         while (true) {
             String guess = solver.next(response);
-            System.out.println(solver.getConfirmedCount() + " - " + solver.getRemain() + "" + solver.getPossibility());
+            print(solver.getConfirmedCount() + " - " + solver.getRemain() + "" + solver.getPossibility());
             response = mock.guess(guess);
-            System.out.printf("Tries %d: %s%n", mock.getRound(), guess);
-            System.out.println(response);
-            System.out.println();
+            print(String.format("Tries %d: %s", mock.getRound(), guess));
+            print(response);
+            print("");
             if (response.equals(Const.CORRECT)) break;
         }
         double seconds = (System.currentTimeMillis() - start) / 1000.0;

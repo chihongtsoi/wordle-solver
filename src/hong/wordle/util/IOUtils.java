@@ -7,6 +7,10 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class IOUtils {
+    private static final boolean PRINT = parseBoolean(System.getenv("WORDLE_PRINT"));
+    private static boolean parseBoolean(String s){
+        return !"false".equalsIgnoreCase(s);
+    }
     public static List<String> allWords() {
         return readAllWords(Const.WORD_LIST);
     }
@@ -17,6 +21,7 @@ public class IOUtils {
         File[] files;
         if (file.isFile()) files = new File[]{file};
         else files = file.listFiles();
+        assert files != null;
         Arrays.stream(files).parallel().forEach(f -> {
             try (Scanner scanner = new Scanner(f)) {
                 while (scanner.hasNext()) {
@@ -32,4 +37,7 @@ public class IOUtils {
         return words;
     }
 
+    public static void print(String s){
+        if(PRINT) System.out.println(s);
+    }
 }

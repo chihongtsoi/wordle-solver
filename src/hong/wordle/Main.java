@@ -6,7 +6,7 @@ import hong.wordle.util.IOUtils;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-
+import static hong.wordle.util.IOUtils.*;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -15,8 +15,8 @@ public class Main {
         String response = null;
 
         while (true) {
-            System.out.printf("%d Tries: %s%n", solver.getRound()+1, solver.next(response));
-            System.out.printf("Remain %d possibilities: %s%n", solver.getRemain(), solver.getPossibility().toString());
+            System.out.println(String.format("%d Tries: %s", solver.getRound()+1, solver.next(response)));
+            print(String.format("Remain %d possibilities: %s", solver.getRemain(), solver.getPossibility().toString()));
             response = scanner.nextLine();
             System.out.println();
             if (response.trim().equals("CCCCC")) break;
@@ -26,9 +26,4 @@ public class Main {
 
 }
 
-/*
-WWCPW
-WPWWW
-WWWCC
-CCCCC
- */
+
