@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class IOUtils {
-    private static final boolean PRINT = parseBoolean(System.getenv("WORDLE_PRINT"));
+    private static final boolean PRINT = Boolean.parseBoolean(System.getenv("WORDLE_PRINT"));
     private static boolean parseBoolean(String s){
         return !"false".equalsIgnoreCase(s);
     }
