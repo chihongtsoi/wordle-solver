@@ -1,4 +1,4 @@
-package hong.wordle.data;
+package hong.wordle.preprocess;
 
 import hong.wordle.solver.MapReduce;
 import hong.wordle.util.IOUtils;

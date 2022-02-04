@@ -3,11 +3,11 @@ package hong.wordle.util;
 import java.util.Comparator;
 import java.util.Map;
 
-public class EntryComparator<T> implements Comparator<Map.Entry<String, T>> {
+public class WordEntryComparator<T> implements Comparator<Map.Entry<String, T>> {
 
     private final Comparator<T> valueComparator;
 
-    public EntryComparator(Comparator<T> valueComparator) {
+    public WordEntryComparator(Comparator<T> valueComparator) {
         this.valueComparator = valueComparator;
     }
 

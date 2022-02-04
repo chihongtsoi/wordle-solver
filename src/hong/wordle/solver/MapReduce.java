@@ -1,7 +1,7 @@
 package hong.wordle.solver;
 
 import hong.wordle.util.DoubleArrayComparator;
-import hong.wordle.util.EntryComparator;
+import hong.wordle.util.WordEntryComparator;
 import hong.wordle.util.IntArrayComparator;
 
 import java.util.*;
@@ -77,7 +77,7 @@ public class MapReduce {
     public String reduce(Map<Character, Integer> confirmed) {
         Map<Character, Integer> charCount = possibilityCharCount();
         return words.parallelStream().map(p -> includeCount(p, confirmed,charCount))
-                .max(new EntryComparator<>(IntArrayComparator.comparator))
+                .max(new WordEntryComparator<>(IntArrayComparator.comparator))
                 .orElseThrow().getKey();
     }
 
@@ -99,18 +99,16 @@ public class MapReduce {
             if(counting[i]>1 && counting[i]>=charCount.getOrDefault(c, Integer.MAX_VALUE)){
                 count.addAll(countMap.get(c)[counting[i]-1]);
             }
-
         }
-        // TODO include duplicate char
         return Map.entry(s, new int[]{include.size(), position.size(), count.size()});
     }
 
     public String findDuplicateChar(Map<Character, Integer> confirmed) {
         Map<Character, Integer> map = getPossibleChar();
         List<Map.Entry<String, Integer>> l = words.parallelStream().map(p -> duplicateChar(p, map, confirmed))
-                .sorted(new EntryComparator<>(Comparator.comparingInt(i -> i)))
+                .sorted(new WordEntryComparator<>(Comparator.comparingInt(i -> i)))
                 .collect(Collectors.toList());
-        Map.Entry<String, Integer> e = l.stream().max(new EntryComparator<>(Comparator.comparingInt(i -> i)))
+        Map.Entry<String, Integer> e = l.stream().max(new WordEntryComparator<>(Comparator.comparingInt(i -> i)))
                 .orElseThrow();
         return e.getKey();
     }

@@ -9,7 +9,6 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
-
         Scanner scanner = new Scanner(System.in);
         Set<String> allWords = new HashSet<>(IOUtils.allWords());
         Solver solver = new Solver(allWords);
