@@ -8,11 +8,10 @@ import java.util.Collection;
 
 public class MockSingleWord {
 
-    private static final String HIDDEN_WORD = "torts";
+    private static final String HIDDEN_WORD = "inlet";
     public static void main(String[] args) {
-        Collection<String> all = IOUtils.readAllWords("words");
+        Collection<String> all = IOUtils.readAllWords(Const.WORD_LIST);
         long start = System.currentTimeMillis();
-
         MockWordle mock = new MockWordle(HIDDEN_WORD);
         Solver solver = new Solver(all);
         String response = null;

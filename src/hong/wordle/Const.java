@@ -1,11 +1,17 @@
 package hong.wordle;
 
+import hong.wordle.util.Tiles;
+
 import java.util.Map;
 
 public class Const {
     public static final String WORD_LIST = "wordle-word-list.txt";
     public static final String FIRST_TRIES = "toeas";
-    public static final String CORRECT = "CCCCC";
+    public static final String CORRECT = String.valueOf(Tiles.CORRECT.toChar()) +
+            Tiles.CORRECT.toChar() +
+            Tiles.CORRECT.toChar() +
+            Tiles.CORRECT.toChar() +
+            Tiles.CORRECT.toChar();
     public static final int MOCK_WORDLE_LIMIT = 10;
 
     public static final Map<Character, Integer> charRank = Map.ofEntries(

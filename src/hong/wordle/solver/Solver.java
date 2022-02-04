@@ -16,7 +16,7 @@ public class Solver {
     private int round;
     private int confirmedCount;
     private boolean confirmedDuplicate;
-
+    private Set<String> tried;
     public Solver(Collection<String> allWords) {
         this(allWords, Const.FIRST_TRIES);
     }
@@ -27,6 +27,7 @@ public class Solver {
         this.current_try = current_try;
         this.confirmed = new HashMap<>();
         this.round = 0;
+        this.tried = new HashSet<>();
     }
 
     public String next(String s) {
@@ -50,9 +51,13 @@ public class Solver {
                 //} else if (!confirmedDuplicate && confirmedCount >= 3 && hasDuplicateChar()) {
                 //    current_try = mapReduce.findDuplicateChar(confirmed);
                 } else {
-                  current_try = mapReduce.reduce(confirmed);
+                    current_try = mapReduce.reduce(confirmed);
+                    if (tried.contains(current_try)) {
+                        current_try = mapReduce.confirmedConstruction();
+                    }
                 }
         }
+        tried.add(current_try);
         possibility.remove(current_try);
         return current_try;
     }
@@ -68,7 +73,8 @@ public class Solver {
         int[] correct_count = new int[26];
         int[] guess_count = new int[26];
         for (int i = 0; i < 5; i++) {
-            if (feedbacks[i] == Tiles.CORRECT || feedbacks[i] == Tiles.PRESENT) correct_count[current_try.charAt(i) - 'a']++;
+            if (feedbacks[i] == Tiles.CORRECT || feedbacks[i] == Tiles.PRESENT)
+                correct_count[current_try.charAt(i) - 'a']++;
             guess_count[current_try.charAt(i) - 'a']++;
         }
         for (int i = 0; i < 5; i++) {
