@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class MockSingleWord {
 
-    private static final String HIDDEN_WORD = "light";
+    private static final String HIDDEN_WORD = "torts";
     public static void main(String[] args) {
         Collection<String> all = IOUtils.readAllWords("words");
         long start = System.currentTimeMillis();
@@ -26,7 +26,7 @@ public class MockSingleWord {
             if (response.equals(Const.CORRECT)) break;
         }
         double seconds = (System.currentTimeMillis() - start) / 1000.0;
-        System.out.printf("Time spend: %.2fs%nTries: %d", seconds, mock.getRound() - 1);
+        System.out.printf("Time spend: %.2fs%nTries: %d", seconds, mock.getRound());
 
     }
 }

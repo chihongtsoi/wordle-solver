@@ -16,7 +16,7 @@ public class Main {
         String response = null;
 
         while (true) {
-            System.out.printf("%d Tries: %s%n", solver.getRound(), solver.next(response));
+            System.out.printf("%d Tries: %s%n", solver.getRound()+1, solver.next(response));
             System.out.printf("Remain %d possibilities: %s%n", solver.getRemain(), solver.getPossibility().toString());
             response = scanner.nextLine();
             System.out.println();

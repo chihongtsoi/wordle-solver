@@ -7,15 +7,12 @@ public class MockWordle {
 
 
     private final String hiddenWord;
-    private final int[] count;
+    private final byte[] count;
     private int round;
 
     public MockWordle(String hiddenWord) {
         this.hiddenWord = hiddenWord;
-        count = new int[26];
-        for (int i = 0; i < hiddenWord.length(); i++) {
-            count[hiddenWord.charAt(i) - 'a']++;
-        }
+        count = Util.toCharCount(hiddenWord);
         this.round = 0;
     }
 

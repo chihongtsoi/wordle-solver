@@ -2,6 +2,7 @@ package hong.wordle.solver;
 
 import hong.wordle.util.DoubleArrayComparator;
 import hong.wordle.util.EntryComparator;
+import hong.wordle.util.IntArrayComparator;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +56,7 @@ public class MapReduce {
 
     private void map(String word) {
         boolean[] add = new boolean[26];
-        int[] count = toCharCount(word);
+        byte[] count = toCharCount(word);
         for (int i = 0; i < 5; i++) {
             char c = word.charAt(i);
             positionMaps[i].get(c).add(word);
@@ -74,21 +75,39 @@ public class MapReduce {
 
 
     public String reduce(Map<Character, Integer> confirmed) {
-        return words.parallelStream().map(p -> includeCount(p, confirmed))
-                .max(new EntryComparator<>(Comparator.comparingInt(i -> i)))
+        Map<Character, Integer> charCount = possibilityCharCount();
+        return words.parallelStream().map(p -> includeCount(p, confirmed,charCount))
+                .max(new EntryComparator<>(IntArrayComparator.comparator))
                 .orElseThrow().getKey();
     }
 
 
-    private Map.Entry<String, Integer> includeCount(String s, Map<Character, Integer> confirmed) {
-        Set<String> set = new HashSet<>();
-        for (char c : s.toCharArray()) if (!confirmed.containsKey(c)) set.addAll(containMap.get(c));
-        return Map.entry(s, set.size());
+    private Map.Entry<String, int[]> includeCount(String s, Map<Character, Integer> confirmed,Map<Character, Integer> charCount) {
+        Set<String> include = new HashSet<>();
+        Set<String> position = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            char c = s.charAt(i);
+            if (!confirmed.containsKey(c) ){
+                include.addAll(containMap.get(c));
+                position.addAll(positionMaps[i].get(c));
+            }
+        }
+        Set<String> count = new HashSet<>();
+        byte[] counting = toCharCount(s);
+        for (int i = 0; i < 26; i++) {
+            char c = toChar(i);
+            if(counting[i]>1 && counting[i]>=charCount.getOrDefault(c, Integer.MAX_VALUE)){
+                count.addAll(countMap.get(c)[counting[i]-1]);
+            }
+
+        }
+        // TODO include duplicate char
+        return Map.entry(s, new int[]{include.size(), position.size(), count.size()});
     }
 
-    public String findLeftChar(Map<Character, Integer> confirmed) {
+    public String findDuplicateChar(Map<Character, Integer> confirmed) {
         Map<Character, Integer> map = getPossibleChar();
-        List<Map.Entry<String, Integer>> l = words.parallelStream().map(p -> leftChar(p, map, confirmed))
+        List<Map.Entry<String, Integer>> l = words.parallelStream().map(p -> duplicateChar(p, map, confirmed))
                 .sorted(new EntryComparator<>(Comparator.comparingInt(i -> i)))
                 .collect(Collectors.toList());
         Map.Entry<String, Integer> e = l.stream().max(new EntryComparator<>(Comparator.comparingInt(i -> i)))
@@ -97,9 +116,9 @@ public class MapReduce {
     }
 
 
-    private Map.Entry<String, Integer> leftChar(String s, Map<Character, Integer> map, Map<Character, Integer> confirmed) {
+    private Map.Entry<String, Integer> duplicateChar(String s, Map<Character, Integer> map, Map<Character, Integer> confirmed) {
         int score = 0;
-        int[] count = toCharCount(s);
+        byte[] count = toCharCount(s);
         for (int i = 0; i < 26; i++) {
             if (count[i] <= 0) continue;
             char c = toChar(i);
@@ -114,7 +133,7 @@ public class MapReduce {
     public Map<Character, Integer> getPossibleChar() {
         Map<Character, Integer> map = new ConcurrentHashMap<>();
         possibilities.parallelStream().forEach(w -> {
-            int[] count = toCharCount(w);
+            byte[] count = toCharCount(w);
             for (int i = 0; i < 26; i++) {
                 if (count[i] > 0) {
                     char c = toChar(i);
@@ -169,7 +188,19 @@ public class MapReduce {
         return null;
     }
 
-    private Set<String> newSet() {
+    private Map<Character, Integer> possibilityCharCount(){
+        Map<Character, Integer> count = new ConcurrentHashMap<>();
+        possibilities.parallelStream().forEach(s->{
+            byte[] charCount = toCharCount(s);
+            for (int i = 0; i < 26; i++) {
+                char c = toChar(i);
+                final int index = i;
+                count.compute(c,(k,v)->v==null? charCount[index]:Math.max(charCount[index],v));
+            }
+        });
+        return count;
+    }
+    private static Set<String> newSet() {
         return Collections.synchronizedSet(new HashSet<>());
     }
 

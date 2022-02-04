@@ -1,13 +1,13 @@
 package hong.wordle.util;
 
 public class Util {
-    public static String wordleSimulation(String hidden, String guess, int[] count) {
-        int[] tmp = count.clone();
+    public static String wordleSimulation(String hidden, String guess, byte[] count) {
+        byte[] tmp = count.clone();
         char[] result = new char[5];
         for (int i = 0; i < 5; i++) {
             char c = guess.charAt(i);
             if (c == hidden.charAt(i)) {
-                result[i] = 'C';
+                result[i] = Tiles.CORRECT.toChar();
                 tmp[c - 'a']--;
             }
         }
@@ -15,10 +15,10 @@ public class Util {
             char c = guess.charAt(i);
             if (c != hidden.charAt(i)) {
                 if (tmp[c - 'a'] > 0) {
-                    result[i] = 'P';
+                    result[i] = Tiles.PRESENT.toChar();
                     tmp[c - 'a']--;
                 } else {
-                    result[i] = 'W';
+                    result[i] = Tiles.ABSENT.toChar();
                 }
             }
         }
@@ -29,8 +29,8 @@ public class Util {
         return wordleSimulation(hidden, guess, toCharCount(hidden));
     }
 
-    public static int[] toCharCount(String s) {
-        int[] count = new int[26];
+    public static byte[] toCharCount(String s) {
+        byte[] count = new byte[26];
         for (int i = 0; i < s.length(); i++) count[s.charAt(i) - 'a']++;
         return count;
     }

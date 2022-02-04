@@ -47,10 +47,10 @@ public class Solver {
             default:
                 if (confirmedCount >= 5) {
                     current_try = mapReduce.confirmedConstruction();
-                } else if (!confirmedDuplicate && confirmedCount >= 4 && hasDuplicateChar()) {
-                    current_try = mapReduce.findLeftChar(confirmed);
+                //} else if (!confirmedDuplicate && confirmedCount >= 3 && hasDuplicateChar()) {
+                //    current_try = mapReduce.findDuplicateChar(confirmed);
                 } else {
-                    current_try = mapReduce.reduce(confirmed);
+                  current_try = mapReduce.reduce(confirmed);
                 }
         }
         possibility.remove(current_try);
@@ -60,7 +60,7 @@ public class Solver {
     private Tiles[] validateResponse(String s) {
         if (s.length() != 5) return null;
         Tiles[] feedbacks = new Tiles[5];
-        for (int i = 0; i < 5; i++) feedbacks[i] = Tiles.valueOf(String.valueOf(s.charAt(i)));
+        for (int i = 0; i < 5; i++) feedbacks[i] = Tiles.valueOf(s.charAt(i));
         return feedbacks;
     }
 
@@ -68,26 +68,26 @@ public class Solver {
         int[] correct_count = new int[26];
         int[] guess_count = new int[26];
         for (int i = 0; i < 5; i++) {
-            if (feedbacks[i] == Tiles.C || feedbacks[i] == Tiles.P) correct_count[current_try.charAt(i) - 'a']++;
+            if (feedbacks[i] == Tiles.CORRECT || feedbacks[i] == Tiles.PRESENT) correct_count[current_try.charAt(i) - 'a']++;
             guess_count[current_try.charAt(i) - 'a']++;
         }
         for (int i = 0; i < 5; i++) {
             switch (feedbacks[i]) {
-                case C:
+                case CORRECT:
                     possibility.retainAll(mapReduce.get(MapReduce.POSITION, i, current_try.charAt(i)));
 
                     break;
-                case P:
+                case PRESENT:
                     possibility.retainAll(mapReduce.get(MapReduce.CONTAIN, current_try.charAt(i)));
                     possibility.removeAll(mapReduce.get(MapReduce.POSITION, i, current_try.charAt(i)));
                     break;
-                case W:
+                case ABSENT:
                     if (correct_count[current_try.charAt(i) - 'a'] <= 0)
                         possibility.removeAll(mapReduce.get(MapReduce.CONTAIN, current_try.charAt(i)));
                     break;
             }
             if (!confirmed.containsKey(current_try.charAt(i))) {
-                if (feedbacks[i] != Tiles.W) confirmedCount++;
+                if (feedbacks[i] != Tiles.ABSENT) confirmedCount++;
                 confirmed.put(current_try.charAt(i), 1);
             }
         }
