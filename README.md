@@ -1,6 +1,6 @@
 
 
-# Parallelized Java Wordle Solver
+# Java Wordle Solver
 
 ## Compile
 
