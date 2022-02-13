@@ -1,4 +1,4 @@
-package hong.wordle;
+package hong.wordle.util;
 
 import hong.wordle.util.Tiles;
 

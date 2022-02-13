@@ -1,7 +1,7 @@
 package hong.wordle.solver;
 
 
-import hong.wordle.Const;
+import hong.wordle.util.Const;
 import hong.wordle.util.Tiles;
 import hong.wordle.util.Util;
 import hong.wordle.util.WordComparator;
@@ -46,16 +46,16 @@ public class Solver {
                 current_try = WordComparator.comparator.compare(tmp[0], tmp[1]) > 0 ? tmp[0] : tmp[1];
                 break;
             default:
-                if (confirmedCount >= 5) {
-                    current_try = mapReduce.confirmedConstruction();
-                //} else if (!confirmedDuplicate && confirmedCount >= 3 && hasDuplicateChar()) {
-                //    current_try = mapReduce.findDuplicateChar(confirmed);
-                } else {
+                //if (confirmedCount >= 5) {
+                //    current_try = mapReduce.confirmedConstruction();
+                ////} else if (!confirmedDuplicate && confirmedCount >= 3 && hasDuplicateChar()) {
+                ////    current_try = mapReduce.findDuplicateChar(confirmed);
+                //} else {
                     current_try = mapReduce.reduce(confirmed);
                     if (tried.contains(current_try)) {
                         current_try = mapReduce.confirmedConstruction();
                     }
-                }
+                //}
         }
         tried.add(current_try);
         possibility.remove(current_try);

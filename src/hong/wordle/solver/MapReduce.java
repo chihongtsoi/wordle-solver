@@ -16,9 +16,9 @@ public class MapReduce {
     public static final int CONTAIN = 2;
     public static final int CONFIRMED_COUNT = 3;
     public static final int AT_LEAST_COUNT = 4;
-    private Map<Character, Set<String>>[] positionMaps;
+    private List<Map<Character, Set<String>>> positionMaps;
     private Map<Character, Set<String>> containMap;
-    private Map<Character, Set<String>[]> countMap;
+    private Map<Character, List<Set<String>>> countMap;
     private final Collection<String> words;
     private final Collection<String> possibilities;
 
@@ -29,22 +29,22 @@ public class MapReduce {
     }
 
     private void init() {
-        positionMaps = new Map[5];
+        positionMaps = new ArrayList<>(5);
         containMap = new ConcurrentHashMap<>();
         countMap = new ConcurrentHashMap<>();
-        for (int i = 0; i < positionMaps.length; i++) {
-            positionMaps[i] = new ConcurrentHashMap<>();
+        for (int i = 0; i < 5; i++) {
+            positionMaps.add(new ConcurrentHashMap<>()) ;
             for (char j = 'a'; j <= 'z'; j++) {
-                positionMaps[i].put(j, newSet());
+                positionMaps.get(i).put(j, newSet());
             }
         }
         for (char i = 'a'; i <= 'z'; i++) {
             containMap.put(i, newSet());
-            Set<String>[] arr = new Set[3];
-            countMap.put(i, arr);
+            List<Set<String>> arr = new ArrayList<>(3);
             for (int j = 0; j < 3; j++) {
-                arr[j] = newSet();
+                arr.add(newSet());
             }
+            countMap.put(i, arr);
         }
 
     }
@@ -59,7 +59,7 @@ public class MapReduce {
         byte[] count = toCharCount(word);
         for (int i = 0; i < 5; i++) {
             char c = word.charAt(i);
-            positionMaps[i].get(c).add(word);
+            positionMaps.get(i).get(c).add(word);
             if (!add[c - 'a']) {
                 containMap.get(c).add(word);
                 add[c - 'a'] = true;
@@ -68,7 +68,7 @@ public class MapReduce {
         for (int i = 0; i < 26; i++) {
             if (count[i] > 0) {
                 char c = toChar(i);
-                countMap.get(c)[count[i] - 1].add(word);
+                countMap.get(c).get(count[i] - 1).add(word);
             }
         }
     }
@@ -89,7 +89,7 @@ public class MapReduce {
             char c = s.charAt(i);
             if (!confirmed.containsKey(c) ){
                 include.addAll(containMap.get(c));
-                position.addAll(positionMaps[i].get(c));
+                position.addAll(positionMaps.get(i).get(c));
             }
         }
         Set<String> count = new HashSet<>();
@@ -97,50 +97,10 @@ public class MapReduce {
         for (int i = 0; i < 26; i++) {
             char c = toChar(i);
             if(counting[i]>1 && counting[i]>=charCount.getOrDefault(c, Integer.MAX_VALUE)){
-                count.addAll(countMap.get(c)[counting[i]-1]);
+                count.addAll(countMap.get(c).get(counting[i]-1));
             }
         }
         return Map.entry(s, new int[]{include.size(), position.size(), count.size()});
-    }
-
-    public String findDuplicateChar(Map<Character, Integer> confirmed) {
-        Map<Character, Integer> map = getPossibleChar();
-        List<Map.Entry<String, Integer>> l = words.parallelStream().map(p -> duplicateChar(p, map, confirmed))
-                .sorted(new WordEntryComparator<>(Comparator.comparingInt(i -> i)))
-                .collect(Collectors.toList());
-        Map.Entry<String, Integer> e = l.stream().max(new WordEntryComparator<>(Comparator.comparingInt(i -> i)))
-                .orElseThrow();
-        return e.getKey();
-    }
-
-
-    private Map.Entry<String, Integer> duplicateChar(String s, Map<Character, Integer> map, Map<Character, Integer> confirmed) {
-        int score = 0;
-        byte[] count = toCharCount(s);
-        for (int i = 0; i < 26; i++) {
-            if (count[i] <= 0) continue;
-            char c = toChar(i);
-            Integer m = map.get(c);
-            if (m == null) continue;
-            if (m > 1 && count[i] >= m) score += count[i] * 10;
-            else score += 1;
-        }
-        return Map.entry(s, score);
-    }
-
-    public Map<Character, Integer> getPossibleChar() {
-        Map<Character, Integer> map = new ConcurrentHashMap<>();
-        possibilities.parallelStream().forEach(w -> {
-            byte[] count = toCharCount(w);
-            for (int i = 0; i < 26; i++) {
-                if (count[i] > 0) {
-                    char c = toChar(i);
-                    final int index = i;
-                    map.compute(c, (k, v) -> v == null ? count[index] : Math.max(v, count[index]));
-                }
-            }
-        });
-        return map;
     }
 
     public String confirmedConstruction() {
@@ -171,15 +131,15 @@ public class MapReduce {
     public Collection<String> get(int type, int... args) {
         switch (type) {
             case POSITION:
-                return positionMaps[args[0]].get((char) args[1]);
+                return positionMaps.get(args[0]).get((char) args[1]);
             case CONTAIN:
                 return containMap.get((char) args[0]);
             case CONFIRMED_COUNT:
-                return countMap.get((char) args[0])[args[1] - 1];
+                return countMap.get((char) args[0]).get(args[1] - 1);
             case AT_LEAST_COUNT:
                 Set<String> set = new HashSet<>();
                 for (int i = 0; i < args[1] - 1; i++) {
-                    set.addAll(countMap.get((char) args[0])[i]);
+                    set.addAll(countMap.get((char) args[0]).get(i));
                 }
                 return set;
         }
@@ -197,21 +157,15 @@ public class MapReduce {
             }
         });
         return count;
+
     }
     private static Set<String> newSet() {
         return Collections.synchronizedSet(new HashSet<>());
-    }
-
-    public Map<Character, Set<String>>[] getPositionMaps() {
-        return positionMaps;
     }
 
     public Map<Character, Set<String>> getContainMap() {
         return containMap;
     }
 
-    public Map<Character, Set<String>[]> getCountMap() {
-        return countMap;
-    }
 }
 

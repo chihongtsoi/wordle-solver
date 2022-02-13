@@ -1,6 +1,6 @@
 package hong.wordle.mock;
 
-import hong.wordle.Const;
+import hong.wordle.util.Const;
 import hong.wordle.util.Util;
 
 public class MockWordle {

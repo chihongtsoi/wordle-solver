@@ -1,7 +1,5 @@
 package hong.wordle.util;
 
-import hong.wordle.Const;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;

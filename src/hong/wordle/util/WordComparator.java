@@ -1,7 +1,5 @@
 package hong.wordle.util;
 
-import hong.wordle.Const;
-
 import java.util.Comparator;
 
 public class WordComparator implements Comparator<String> {

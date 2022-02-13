@@ -1,4 +1,4 @@
-package hong.wordle;
+package hong.wordle.solver;
 
 import hong.wordle.solver.Solver;
 import hong.wordle.util.IOUtils;
@@ -17,6 +17,7 @@ public class Main {
         while (true) {
             System.out.println(String.format("%d Tries: %s", solver.getRound()+1, solver.next(response)));
             print(String.format("Remain %d possibilities: %s", solver.getRemain(), solver.getPossibility().toString()));
+            System.out.print(">");
             response = scanner.nextLine();
             System.out.println();
             if (response.trim().equals("CCCCC")) break;
