@@ -26,7 +26,12 @@ Program output:
 >
 ```
 Wordle input:
+
+<br>
+
 ![](img/wordle-input.png)
+
+<br>
 
 Program input:
 ```
@@ -35,7 +40,12 @@ P - Present (Yellow)
 C - Correct (Green)
 ```
 Example:
+
+<br>
+
 ![](img/program-input-example.png)
+
+<br>
 Input will be
 ```
 AAPCA
